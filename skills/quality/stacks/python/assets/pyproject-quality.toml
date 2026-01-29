@@ -1,0 +1,50 @@
+# Ruff configuration snippet for pyproject.toml
+# Copy this section and paste it into your project's pyproject.toml file
+# This is an alternative to creating a standalone ruff.toml
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+indent-width = 4
+
+[tool.ruff.lint]
+# Select rules
+extend-select = [
+  "I",    # Import sorting (isort)
+  "F",    # Pyflakes (bug detection)
+  "E",    # Errors
+  "W",    # Warnings
+  "UP",   # PyUpgrade
+  "D",    # pydocstyle
+]
+
+# Ignore specific rules
+extend-ignore = [
+  "E501",   # Line too long (handled by formatter)
+  "D100",   # Missing docstring in public module
+  "D104",   # Missing docstring in public package
+]
+
+# Per-file rule configuration
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "D104"]  # Unused imports, missing docstring
+"tests/*" = ["D100", "D101"]      # Don't require docstrings in tests
+"*_test.py" = ["D100"]
+
+# Import sorting configuration
+[tool.ruff.lint.isort]
+known-first-party = ["your_package"]
+multi-line-mode = 3
+include-trailing-comma = true
+force-grid-wrap = 0
+use-parentheses = true
+ensure-newline-before-comments = true
+
+# Formatter configuration
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"

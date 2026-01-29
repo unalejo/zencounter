@@ -1,0 +1,388 @@
+# Best Practices Audit Checklist
+# Used by best-practices-auditor skill to validate projects
+
+categories:
+  agentic_boost:
+    name: "Agentic-Boost Completeness"
+    checks:
+      - id: skills_dir
+        name: "Skills directory exists"
+        severity: critical
+        detection:
+          type: directory
+          path: "skills"
+        fix:
+          skill: null
+          manual: "Run install.sh to add agentic-boost"
+
+      - id: root_agents_md
+        name: "Root AGENTS.md exists"
+        severity: critical
+        detection:
+          type: file
+          path: "AGENTS.md"
+        fix:
+          skill: project-bootstrap
+          action: "Create root AGENTS.md"
+
+      - id: component_agents_md
+        name: "Component AGENTS.md files"
+        severity: recommended
+        detection:
+          type: custom
+          description: "Check each top-level dir with src/ has AGENTS.md"
+        fix:
+          skill: project-bootstrap
+          action: "Add missing component AGENTS.md"
+
+      - id: auto_invoke_populated
+        name: "Auto-invoke tables populated"
+        severity: recommended
+        detection:
+          type: grep
+          file: "AGENTS.md"
+          pattern: "\\| Action \\| Skill \\|"
+          not_contains: "(Run skill-sync to populate"
+        fix:
+          skill: skill-sync
+          action: "Update auto-invoke tables"
+
+      - id: ide_configured
+        name: "IDE configuration present"
+        severity: optional
+        detection:
+          type: any_directory
+          paths: [".claude", ".gemini", ".codex"]
+        fix:
+          skill: null
+          manual: "Run ./skills/setup/setup.sh"
+
+  quality_gates:
+    name: "Quality Gates"
+    checks:
+      - id: linting
+        name: "Linting configured"
+        severity: critical
+        detection:
+          type: any_file
+          paths:
+            - "eslint.config.js"
+            - ".eslintrc.js"
+            - ".eslintrc.json"
+            - ".eslintrc.yml"
+            - "ruff.toml"
+            - ".golangci.yml"
+            - "rustfmt.toml"
+        fix:
+          skill: setup-quality
+          action: "Configure linting"
+
+      - id: formatting
+        name: "Formatting configured"
+        severity: recommended
+        detection:
+          type: any_file
+          paths:
+            - "prettier.config.js"
+            - ".prettierrc"
+            - ".prettierrc.json"
+            - "ruff.toml"  # ruff handles formatting too
+            - ".editorconfig"
+        fix:
+          skill: setup-quality
+          action: "Configure formatting"
+
+      - id: pre_commit_hooks
+        name: "Pre-commit hooks configured"
+        severity: recommended
+        detection:
+          type: any_path
+          paths:
+            - ".husky"
+            - ".pre-commit-config.yaml"
+            - ".git/hooks/pre-commit"
+        fix:
+          skill: setup-quality
+          action: "Configure pre-commit hooks"
+
+      - id: type_checking
+        name: "Type checking enabled"
+        severity: recommended
+        detection:
+          type: any_file
+          paths:
+            - "tsconfig.json"
+            - "pyrightconfig.json"
+            - "mypy.ini"
+            - ".mypy.ini"
+        fix:
+          skill: null
+          manual: "Add type checking configuration"
+
+      - id: test_framework
+        name: "Test framework configured"
+        severity: critical
+        detection:
+          type: any_path
+          paths:
+            - "tests"
+            - "test"
+            - "__tests__"
+            - "spec"
+            - "*_test.go"
+            - "*.test.ts"
+            - "*.test.js"
+        fix:
+          skill: null
+          manual: "Create tests directory and add test framework"
+
+      - id: ci_cd
+        name: "CI/CD pipeline configured"
+        severity: recommended
+        detection:
+          type: any_path
+          paths:
+            - ".github/workflows"
+            - ".gitlab-ci.yml"
+            - "Jenkinsfile"
+            - ".circleci"
+            - "azure-pipelines.yml"
+        fix:
+          skill: null
+          manual: "Add CI/CD configuration"
+
+  best_practices:
+    name: "Project Best Practices"
+    checks:
+      - id: readme
+        name: "README.md exists"
+        severity: critical
+        detection:
+          type: file
+          path: "README.md"
+        fix:
+          skill: project-bootstrap
+          action: "Create README.md"
+
+      - id: license
+        name: "LICENSE file exists"
+        severity: recommended
+        detection:
+          type: any_file
+          paths:
+            - "LICENSE"
+            - "LICENSE.md"
+            - "LICENSE.txt"
+        fix:
+          skill: null
+          manual: "Add LICENSE file"
+
+      - id: gitignore
+        name: ".gitignore configured"
+        severity: critical
+        detection:
+          type: file
+          path: ".gitignore"
+        fix:
+          skill: null
+          manual: "Create .gitignore"
+
+      - id: editorconfig
+        name: ".editorconfig present"
+        severity: optional
+        detection:
+          type: file
+          path: ".editorconfig"
+        fix:
+          skill: null
+          manual: "Add .editorconfig for consistent editor settings"
+
+      - id: changelog
+        name: "CHANGELOG.md present"
+        severity: optional
+        detection:
+          type: any_file
+          paths:
+            - "CHANGELOG.md"
+            - "HISTORY.md"
+            - "CHANGES.md"
+        fix:
+          skill: null
+          manual: "Add CHANGELOG.md"
+
+      - id: contributing
+        name: "CONTRIBUTING.md present"
+        severity: optional
+        detection:
+          type: file
+          path: "CONTRIBUTING.md"
+        fix:
+          skill: null
+          manual: "Add CONTRIBUTING.md"
+
+  security:
+    name: "Security Best Practices"
+    checks:
+      - id: no_env_committed
+        name: ".env not in git history"
+        severity: critical
+        detection:
+          type: git_history
+          not_contains: ".env"
+        fix:
+          skill: null
+          manual: "Remove .env from git history using git filter-branch"
+
+      - id: env_in_gitignore
+        name: ".env in .gitignore"
+        severity: critical
+        detection:
+          type: file_contains
+          file: ".gitignore"
+          pattern: "\\.env"
+        fix:
+          skill: null
+          manual: "Add .env to .gitignore"
+
+      - id: secrets_scan
+        name: "No hardcoded secrets"
+        severity: critical
+        detection:
+          type: custom
+          description: "Scan for API keys, passwords in code"
+        fix:
+          skill: null
+          manual: "Remove hardcoded secrets, use environment variables"
+
+  stack_typescript:
+    name: "TypeScript Best Practices"
+    condition:
+      type: file
+      path: "tsconfig.json"
+    checks:
+      - id: ts_strict
+        name: "Strict mode enabled"
+        severity: recommended
+        detection:
+          type: json_value
+          file: "tsconfig.json"
+          path: "compilerOptions.strict"
+          value: true
+        fix:
+          skill: null
+          manual: "Enable strict: true in tsconfig.json"
+
+      - id: ts_no_implicit_any
+        name: "noImplicitAny enabled"
+        severity: recommended
+        detection:
+          type: json_value
+          file: "tsconfig.json"
+          path: "compilerOptions.noImplicitAny"
+          value: true
+        fix:
+          skill: null
+          manual: "Enable noImplicitAny in tsconfig.json"
+
+      - id: ts_strict_null
+        name: "strictNullChecks enabled"
+        severity: recommended
+        detection:
+          type: json_value
+          file: "tsconfig.json"
+          path: "compilerOptions.strictNullChecks"
+          value: true
+        fix:
+          skill: null
+          manual: "Enable strictNullChecks in tsconfig.json"
+
+  stack_python:
+    name: "Python Best Practices"
+    condition:
+      type: any_file
+      paths: ["pyproject.toml", "requirements.txt", "setup.py"]
+    checks:
+      - id: py_pyproject
+        name: "Using pyproject.toml"
+        severity: recommended
+        detection:
+          type: file
+          path: "pyproject.toml"
+        fix:
+          skill: null
+          manual: "Migrate to pyproject.toml"
+
+      - id: py_venv
+        name: "Virtual environment present"
+        severity: critical
+        detection:
+          type: any_path
+          paths:
+            - ".venv"
+            - "venv"
+            - "poetry.lock"
+            - "uv.lock"
+            - "Pipfile.lock"
+        fix:
+          skill: null
+          manual: "Create virtual environment"
+
+      - id: py_type_hints
+        name: "Type hints used"
+        severity: recommended
+        detection:
+          type: custom
+          description: "Check for type annotations in Python files"
+        fix:
+          skill: null
+          manual: "Add type hints to functions"
+
+  stack_go:
+    name: "Go Best Practices"
+    condition:
+      type: file
+      path: "go.mod"
+    checks:
+      - id: go_mod
+        name: "go.mod present"
+        severity: critical
+        detection:
+          type: file
+          path: "go.mod"
+        fix:
+          skill: null
+          manual: "Run go mod init"
+
+      - id: go_sum
+        name: "go.sum present"
+        severity: critical
+        detection:
+          type: file
+          path: "go.sum"
+        fix:
+          skill: null
+          manual: "Run go mod tidy"
+
+      - id: go_lint
+        name: "golangci-lint configured"
+        severity: recommended
+        detection:
+          type: file
+          path: ".golangci.yml"
+        fix:
+          skill: null
+          manual: "Add .golangci.yml configuration"
+
+# Scoring weights
+scoring:
+  severity_weights:
+    critical: 3
+    recommended: 2
+    optional: 1
+
+  grade_thresholds:
+    A: 90
+    B: 80
+    C: 70
+    D: 60
+    F: 0

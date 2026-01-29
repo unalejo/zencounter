@@ -1,0 +1,53 @@
+# Pre-commit hooks configuration for Python projects
+# Reference: https://pre-commit.com/
+#
+# Installation:
+#   1. Add this to .pre-commit-config.yaml in your project root
+#   2. Run: pre-commit install
+#   3. Hooks will run automatically on commit
+#
+# Testing:
+#   - Test all files: pre-commit run --all-files
+#   - Test staged files: pre-commit run
+#   - Bypass hooks: git commit --no-verify
+
+repos:
+  # Ruff linting (replaces: flake8, isort, black, pylint)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.8
+    hooks:
+      # Linter: check code quality
+      - id: ruff
+        args: [--fix]
+        stages: [commit]
+
+      # Formatter: consistent code style
+      - id: ruff-format
+        stages: [commit]
+
+  # YAML validation
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-yaml
+        args: ["--unsafe"]
+      - id: check-toml
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  # Security scanning
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.1
+    hooks:
+      - id: detect-private-key
+
+ci:
+  autofix_commit_msg: |
+    chore(lint): auto-format code with ruff
+
+    - Ruff linting fixes
+    - Ruff format
+  autofix_prs: true
+  autoupdate_commit_msg: "chore(deps): update pre-commit hooks"
+  autoupdate_schedule: weekly
