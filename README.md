@@ -71,4 +71,4 @@ MIT - See [LICENSE](LICENSE) for details.
 
 ## Contributing
 
-Contributions welcome! Please read the [AGENTS.md](AGENTS.md) for development guidelines.
+Contributions welcome! Follow conventional commits and run `yarn lint` before committing.

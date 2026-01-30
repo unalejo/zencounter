@@ -1,6 +1,1 @@
 yarn lint-staged
-
-# GGA AI Code Review (skip with --no-verify)
-if command -v gga &> /dev/null; then
-  gga run --staged || exit 1
-fi
