@@ -32,6 +32,9 @@ yarn-error.log*
 !.vscode/extensions.json
 .idea/
 
+# AI agent configs (injected externally)
+.claude/
+
 # OS files
 .DS_Store
 Thumbs.db
